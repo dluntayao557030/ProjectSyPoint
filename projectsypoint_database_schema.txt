@@ -1,0 +1,101 @@
+projectsypoint_database_schema
+
+CREATE DATABASE projectsypoint;
+USE projectsypoint;
+
+-- ===============================
+-- Reference Tables
+-- ===============================
+
+CREATE TABLE categories (
+    category_id INT AUTO_INCREMENT PRIMARY KEY,
+    category_name VARCHAR(100) NOT NULL UNIQUE
+);
+
+CREATE TABLE discount_types (
+    discount_type_id INT AUTO_INCREMENT PRIMARY KEY,
+    type_name VARCHAR(50) NOT NULL UNIQUE,
+    discount_percentage DECIMAL(5,2) NOT NULL DEFAULT 0
+);
+
+-- ===============================
+-- Users Table (Admin / Cashier)
+-- ===============================
+
+CREATE TABLE users (
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    full_name VARCHAR(100) NOT NULL,
+    role ENUM('admin','cashier') NOT NULL,
+    shift ENUM('morning','afternoon','evening','night') NOT NULL,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+-- ===============================
+-- Products Table
+-- ===============================
+
+CREATE TABLE products (
+    product_id INT AUTO_INCREMENT PRIMARY KEY,
+
+    -- Reference number typed/scanned by cashier
+    reference_number VARCHAR(50) NOT NULL UNIQUE,
+
+    product_name VARCHAR(200) NOT NULL,
+    price DECIMAL(10,2) NOT NULL,
+    category_id INT NOT NULL,
+
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (category_id) REFERENCES categories(category_id)
+);
+
+-- ===============================
+-- Transactions Table
+-- ===============================
+
+CREATE TABLE transactions (
+    transaction_id INT AUTO_INCREMENT PRIMARY KEY,
+    transaction_number VARCHAR(50) NOT NULL UNIQUE,
+    cashier_id INT NOT NULL,
+    transaction_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    subtotal DECIMAL(10,2) NOT NULL,
+    discount_amount DECIMAL(10,2) DEFAULT 0,
+    final_total DECIMAL(10,2) NOT NULL,
+
+    discount_type_id INT,
+
+    status ENUM('completed','voided') DEFAULT 'completed',
+    void_reason TEXT,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (cashier_id) REFERENCES users(user_id),
+    FOREIGN KEY (discount_type_id) REFERENCES discount_types(discount_type_id)
+);
+
+-- ===============================
+-- Transaction Items Table
+-- ===============================
+
+CREATE TABLE transaction_items (
+    transaction_item_id INT AUTO_INCREMENT PRIMARY KEY,
+    transaction_id INT NOT NULL,
+    product_id INT NOT NULL,
+
+    -- Snapshot data (important for historical accuracy)
+    product_name VARCHAR(200) NOT NULL,
+    quantity DECIMAL(10,2) NOT NULL,
+    unit_price DECIMAL(10,2) NOT NULL,
+    total_price DECIMAL(10,2) NOT NULL,
+
+    FOREIGN KEY (transaction_id) REFERENCES transactions(transaction_id),
+    FOREIGN KEY (product_id) REFERENCES products(product_id)
+);

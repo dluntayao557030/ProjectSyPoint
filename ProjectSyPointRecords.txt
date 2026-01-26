@@ -1,0 +1,150 @@
+ProjectSyPointRecords
+
+--Categories
+
+INSERT INTO categories (category_name) VALUES
+('Produce'),
+('Dairy'),
+('Bakery'),
+('Beverages'),
+('Snacks'),
+('Canned Goods'),
+('Frozen Foods'),
+('Meat & Poultry'),
+('Household Supplies'),
+('Pasta & Rice');
+
+--Discount Types
+INSERT INTO discount_types (type_name, discount_percentage) VALUES
+('PWD', 20.00),
+('Senior Citizen', 20.00);
+
+--Users
+INSERT INTO users (username, password, full_name, role, shift, is_active) VALUES
+('admin', 'admin', 'System Administrator', 'admin', 'morning', 1),
+('cashier1', 'cashier1', 'Maria Santos', 'cashier', 'morning', 1),
+('cashier2', 'cashier2', 'Jose Dela Cruz', 'cashier', 'afternoon', 1),
+('cashier3', 'cashier3', 'Ana Reyes', 'cashier', 'evening', 1),
+('cashier4', 'cashier4', 'Luis Garcia', 'cashier', 'night', 1);
+
+--Products
+INSERT INTO products (reference_number, product_name, price, category_id) VALUES
+-- Produce (1)
+('PRO-001','Bananas',50.00,1),
+('PRO-002','Apples',120.00,1),
+('PRO-003','Oranges',100.00,1),
+('PRO-004','Lettuce',45.00,1),
+('PRO-005','Carrots',60.00,1),
+('PRO-006','Tomatoes',80.00,1),
+('PRO-007','Potatoes',70.00,1),
+('PRO-008','Broccoli',90.00,1),
+('PRO-009','Cucumbers',55.00,1),
+('PRO-010','Strawberries',150.00,1),
+
+-- Dairy (2)
+('DAI-001','Milk 1L',95.00,2),
+('DAI-002','Eggs (12pcs)',85.00,2),
+('DAI-003','Cheddar Cheese 200g',180.00,2),
+('DAI-004','Yogurt 500g',130.00,2),
+('DAI-005','Butter 250g',150.00,2),
+('DAI-006','Cream 250ml',125.00,2),
+('DAI-007','Sliced Cheese 150g',140.00,2),
+('DAI-008','Condensed Milk 370ml',80.00,2),
+('DAI-009','Powdered Milk 500g',260.00,2),
+('DAI-010','Greek Yogurt 400g',160.00,2),
+
+-- Bakery (3)
+('BAK-001','Bread Loaf White',60.00,3),
+('BAK-002','Bread Loaf Wheat',70.00,3),
+('BAK-003','Baguette',55.00,3),
+('BAK-004','Bagels (6pcs)',85.00,3),
+('BAK-005','Croissants (4pcs)',95.00,3),
+('BAK-006','Muffins (4pcs)',90.00,3),
+('BAK-007','Donuts (6pcs)',80.00,3),
+('BAK-008','Brownie Pack',120.00,3),
+('BAK-009','Cookies Pack',110.00,3),
+('BAK-010','Cake Slice',150.00,3),
+
+-- Beverages (4)
+('BEV-001','Coca-Cola 1.5L',95.00,4),
+('BEV-002','Sprite 1.5L',95.00,4),
+('BEV-003','Bottled Water 1.5L',30.00,4),
+('BEV-004','Orange Juice 1L',85.00,4),
+('BEV-005','Iced Tea 1L',75.00,4),
+('BEV-006','Coffee 250g',240.00,4),
+('BEV-007','Tea Bags 100s',180.00,4),
+('BEV-008','Energy Drink 500ml',120.00,4),
+('BEV-009','Sports Drink 1L',105.00,4),
+('BEV-010','Milk Tea 1L',90.00,4),
+
+-- Snacks (5)
+('SNA-001','Potato Chips 100g',55.00,5),
+('SNA-002','Tortilla Chips 150g',75.00,5),
+('SNA-003','Popcorn 120g',65.00,5),
+('SNA-004','Mixed Nuts 200g',220.00,5),
+('SNA-005','Chocolate Bar 100g',95.00,5),
+('SNA-006','Cookies 200g',85.00,5),
+('SNA-007','Pretzels 150g',70.00,5),
+('SNA-008','Crackers 180g',80.00,5),
+('SNA-009','Snack Mix 200g',150.00,5),
+('SNA-010','Candy Bag 250g',120.00,5),
+
+-- Canned Goods (6)
+('CAN-001','Canned Corn 400g',65.00,6),
+('CAN-002','Canned Peas 400g',60.00,6),
+('CAN-003','Canned Tuna 185g',120.00,6),
+('CAN-004','Canned Beans 400g',55.00,6),
+('CAN-005','Tomato Soup 400g',85.00,6),
+('CAN-006','Fruit Cocktail 400g',90.00,6),
+('CAN-007','Canned Pineapple 400g',95.00,6),
+('CAN-008','Canned Mushroom 400g',85.00,6),
+('CAN-009','Canned Tomatoes 400g',75.00,6),
+('CAN-010','Canned Chili 400g',110.00,6),
+
+-- Frozen Foods (7)
+('FRO-001','Frozen Pizza',350.00,7),
+('FRO-002','Frozen Fries 1kg',180.00,7),
+('FRO-003','Frozen Veg Mix 1kg',190.00,7),
+('FRO-004','Ice Cream Tub 1L',240.00,7),
+('FRO-005','Frozen Dumplings 500g',220.00,7),
+('FRO-006','Frozen Chicken Nuggets',280.00,7),
+('FRO-007','Frozen Fish Fillet 500g',300.00,7),
+('FRO-008','Ice Cream Bars 6pcs',210.00,7),
+('FRO-009','Frozen Burritos 4pcs',260.00,7),
+('FRO-010','Frozen Lasagna',330.00,7),
+
+-- Meat & Poultry (8)
+('MEA-001','Chicken Breast 1kg',320.00,8),
+('MEA-002','Pork Chop 1kg',380.00,8),
+('MEA-003','Ground Beef 1kg',450.00,8),
+('MEA-004','Beef Steak 1kg',600.00,8),
+('MEA-005','Whole Chicken',380.00,8),
+('MEA-006','Sausages 500g',260.00,8),
+('MEA-007','Bacon 250g',210.00,8),
+('MEA-008','Turkey Slices 200g',250.00,8),
+('MEA-009','Lamb Chops 1kg',680.00,8),
+('MEA-010','Ham 1kg',420.00,8),
+
+-- Household Supplies (9)
+('HOU-001','Toilet Paper 12pcs',180.00,9),
+('HOU-002','Dish Soap 500ml',95.00,9),
+('HOU-003','Laundry Detergent 1L',240.00,9),
+('HOU-004','Paper Towels 2-roll',110.00,9),
+('HOU-005','Trash Bags 30pcs',150.00,9),
+('HOU-006','All-purpose Cleaner 1L',130.00,9),
+('HOU-007','Hand Soap 300ml',75.00,9),
+('HOU-008','Sponges Pack',65.00,9),
+('HOU-009','Bleach 1L',90.00,9),
+('HOU-010','Air Freshener 300ml',120.00,9),
+
+-- Pasta & Rice (10)
+('PAS-001','Spaghetti 500g',80.00,10),
+('PAS-002','Macaroni 500g',75.00,10),
+('PAS-003','Rice (White) 5kg',320.00,10),
+('PAS-004','Rice (Brown) 5kg',360.00,10),
+('PAS-005','Instant Noodles 5pcs',60.00,10),
+('PAS-006','Pasta Sauce 680g',140.00,10),
+('PAS-007','Oatmeal 500g',95.00,10),
+('PAS-008','Corn Flakes 500g',110.00,10),
+('PAS-009','Lasagna Sheets 500g',130.00,10),
+('PAS-010','Rice Noodles 500g',85.00,10);
