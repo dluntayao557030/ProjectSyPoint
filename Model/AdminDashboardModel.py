@@ -2,6 +2,7 @@
 AdminDashboardModel.py
 Model for Admin Dashboard operations - Returns queries and parameters
 Controller executes the queries
+No changes needed - provided for completeness
 """
 from datetime import date
 

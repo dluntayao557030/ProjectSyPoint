@@ -13,7 +13,10 @@ class ShiftSummaryView(QWidget):
         self.current_user = current_user or {}
         self.showMaximized()
         self.setWindowTitle("SyPoint POS - Shift Summary")
-        self.setStyleSheet("background-color: #f5f0e8;")
+        palette = self.palette()
+        palette.setColor(self.backgroundRole(), QColor("#f5f0e8"))
+        self.setPalette(palette)
+        self.setAutoFillBackground(True)
 
         mainLayout = QHBoxLayout(self)
         mainLayout.setContentsMargins(0, 0, 0, 0)

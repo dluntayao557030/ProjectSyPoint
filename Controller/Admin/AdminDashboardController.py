@@ -1,3 +1,7 @@
+"""
+AdminDashboardController.py - FIXED
+Controller for Admin Dashboard with non-editable KPI detail dialogs
+"""
 import datetime
 from PyQt6.QtWidgets import QMessageBox
 from Utilities.DatabaseConnection import getConnection
@@ -46,46 +50,51 @@ class AdminDashboardController:
     def _load_dashboard_data(self):
         """Load all dashboard data"""
         try:
-            self._load_kpis()
+            today = datetime.date.today()
+
+            # Load KPIs
+            self._load_kpis(today)
+
+            # Load sales chart (default to last 7 days)
             self.update_sales_chart("Last 7 Days")
+
         except Exception as e:
             QMessageBox.critical(self.view, "Error",
                                  f"Failed to load dashboard data: {str(e)}")
-            print(f"Error loading dashboard: {e}")
+            print(f"Error loading dashboard data: {e}")
 
-    def _load_kpis(self):
-        """Load KPI data"""
+    def _load_kpis(self, today: datetime.date):
+        """Load and display KPI data"""
         try:
             conn = getConnection()
             cursor = conn.cursor(dictionary=True)
-            today = datetime.date.today()
 
-            # Total Sales Today
-            query, params = AdminDashboardModel.get_total_sales_today_query(today)
-            cursor.execute(query, params)
+            # Total sales today
+            sales_query, sales_params = AdminDashboardModel.get_total_sales_today_query(today)
+            cursor.execute(sales_query, sales_params)
             result = cursor.fetchone()
             total_sales = float(result['total_sales'] or 0)
             self.kpi_data['total_sales'] = total_sales
             self.view.update_kpi('totalSales', f"PHP {total_sales:,.2f}")
 
-            # Transactions Today
-            query, params = AdminDashboardModel.get_transactions_today_query(today)
-            cursor.execute(query, params)
+            # Transactions today
+            trans_query, trans_params = AdminDashboardModel.get_transactions_today_query(today)
+            cursor.execute(trans_query, trans_params)
             result = cursor.fetchone()
-            transactions = int(result['transaction_count'] or 0)
-            self.kpi_data['transactions'] = transactions
-            self.view.update_kpi('transactions', str(transactions))
+            trans_count = int(result['transaction_count'] or 0)
+            self.kpi_data['transactions'] = trans_count
+            self.view.update_kpi('transactions', str(trans_count))
 
-            # Products Sold Today
-            query, params = AdminDashboardModel.get_products_sold_today_query(today)
-            cursor.execute(query, params)
+            # Products sold today
+            products_query, products_params = AdminDashboardModel.get_products_sold_today_query(today)
+            cursor.execute(products_query, products_params)
             result = cursor.fetchone()
-            products = int(result['products_sold'] or 0)
-            self.kpi_data['products'] = products
-            self.view.update_kpi('products', str(products))
+            products_sold = int(result['products_sold'] or 0)
+            self.kpi_data['products'] = products_sold
+            self.view.update_kpi('products', str(products_sold))
 
-            # Average Sale
-            avg_sale = total_sales / transactions if transactions > 0 else 0
+            # Average sale
+            avg_sale = total_sales / trans_count if trans_count > 0 else 0
             self.kpi_data['avg_sale'] = avg_sale
             self.view.update_kpi('avgSale', f"PHP {avg_sale:,.2f}")
 
@@ -97,49 +106,56 @@ class AdminDashboardController:
             raise
 
     def update_sales_chart(self, filter_text: str):
-        """Update sales chart based on filter"""
+        """Update sales chart based on selected filter"""
         try:
+            today = datetime.date.today()
+
+            if filter_text == "Last 7 Days":
+                start_date = today - datetime.timedelta(days=6)
+                end_date = today
+            elif filter_text == "Last 30 Days":
+                start_date = today - datetime.timedelta(days=29)
+                end_date = today
+            elif filter_text == "This Month":
+                start_date = today.replace(day=1)
+                end_date = today
+            elif filter_text == "Last Month":
+                last_month = today.replace(day=1) - datetime.timedelta(days=1)
+                start_date = last_month.replace(day=1)
+                end_date = last_month
+            else:
+                start_date = today - datetime.timedelta(days=6)
+                end_date = today
+
             conn = getConnection()
             cursor = conn.cursor(dictionary=True)
 
-            # Determine date range
-            today = datetime.date.today()
-            if filter_text == "Last 7 Days":
-                start_date = today - datetime.timedelta(days=6)
-            elif filter_text == "Last 30 Days":
-                start_date = today - datetime.timedelta(days=29)
-            elif filter_text == "This Month":
-                start_date = today.replace(day=1)
-            elif filter_text == "Last Month":
-                first_this_month = today.replace(day=1)
-                start_date = (first_this_month - datetime.timedelta(days=1)).replace(day=1)
-                today = first_this_month - datetime.timedelta(days=1)
-            else:
-                start_date = today - datetime.timedelta(days=6)
-
-            # Get sales data
-            query, params = AdminDashboardModel.get_sales_by_date_query(start_date, today)
+            query, params = AdminDashboardModel.get_sales_by_date_query(start_date, end_date)
             cursor.execute(query, params)
             results = cursor.fetchall()
 
             cursor.close()
             conn.close()
 
-            # Prepare data for chart
-            if results:
-                dates = [row['sale_date'].strftime("%m/%d") for row in results]
-                sales = [float(row['total_sales'] or 0) for row in results]
-            else:
-                dates = ["No Data"]
-                sales = [0]
+            # Prepare data
+            date_range = []
+            current_date = start_date
+            while current_date <= end_date:
+                date_range.append(current_date)
+                current_date += datetime.timedelta(days=1)
 
-            self.view.plot_sales_chart(dates, sales, f"Sales Trend - {filter_text}")
+            sales_dict = {row['sale_date']: float(row['total_sales']) for row in results}
+            sales_data = [sales_dict.get(d, 0) for d in date_range]
+
+            date_labels = [d.strftime('%m/%d') for d in date_range]
+
+            self.view.plot_sales_chart(date_labels, sales_data, f"Sales - {filter_text}")
 
         except Exception as e:
             print(f"Error updating chart: {e}")
 
     def show_sales_detail(self):
-        """Show detailed sales breakdown - NO IDs"""
+        """Show detailed sales breakdown"""
         try:
             dialog = KPIDetailDialog("Total Sales Today", self.view)
 
@@ -154,13 +170,12 @@ class AdminDashboardController:
             cursor.close()
             conn.close()
 
-            columns = ["Transaction #", "Time", "Cashier", "Subtotal", "Discount", "Total"]
+            columns = ["Transaction #", "Date/Time", "Cashier", "Subtotal", "Discount", "Total"]
             data = []
             for row in results:
-                time_str = row['transaction_date'].strftime("%I:%M %p")
                 data.append([
                     row['transaction_number'],
-                    time_str,
+                    row['transaction_date'].strftime('%Y-%m-%d %H:%M:%S'),
                     row['cashier_name'],
                     f"PHP {row['subtotal']:.2f}",
                     f"PHP {row['discount_amount']:.2f}",
@@ -175,7 +190,7 @@ class AdminDashboardController:
             print(f"Error showing sales detail: {e}")
 
     def show_transactions_detail(self):
-        """Show detailed transactions list - NO IDs"""
+        """Show detailed transaction list"""
         try:
             dialog = KPIDetailDialog("Transactions Today", self.view)
 
@@ -190,13 +205,12 @@ class AdminDashboardController:
             cursor.close()
             conn.close()
 
-            columns = ["Transaction #", "Time", "Cashier", "Items", "Total"]
+            columns = ["Transaction #", "Date/Time", "Cashier", "Items", "Total"]
             data = []
             for row in results:
-                time_str = row['transaction_date'].strftime("%I:%M %p")
                 data.append([
                     row['transaction_number'],
-                    time_str,
+                    row['transaction_date'].strftime('%Y-%m-%d %H:%M:%S'),
                     row['cashier_name'],
                     str(row['items_count']),
                     f"PHP {row['final_total']:.2f}"
@@ -210,7 +224,7 @@ class AdminDashboardController:
             print(f"Error showing transactions detail: {e}")
 
     def show_products_detail(self):
-        """Show detailed products sold today - NO IDs"""
+        """Show detailed products sold"""
         try:
             dialog = KPIDetailDialog("Products Sold Today", self.view)
 

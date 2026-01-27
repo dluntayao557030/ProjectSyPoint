@@ -1,3 +1,7 @@
+"""
+AdminDashboardView.py - FIXED
+Admin Dashboard View with non-editable KPI detail tables
+"""
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QFrame,
@@ -32,7 +36,7 @@ class AdminDashboardView(QWidget):
         scrollArea.setStyleSheet("QScrollArea { border: none; }")
 
         contentWidget = QWidget()
-        contentWidget.setStyleSheet("background-color: #f5f0e8;")  # Fixed: Set background on content widget
+        contentWidget.setStyleSheet("background-color: #f5f0e8;")
         contentLayout = QVBoxLayout(contentWidget)
         contentLayout.setContentsMargins(40, 40, 40, 40)
         contentLayout.setSpacing(30)
@@ -288,7 +292,7 @@ class AdminDashboardView(QWidget):
 
 
 class KPIDetailDialog(QDialog):
-    """Dialog to show detailed data when KPI is clicked - NO IDs SHOWN"""
+    """Dialog to show detailed data when KPI is clicked - FIXED: Non-editable tables"""
 
     def __init__(self, title: str, parent=None):
         super().__init__(parent)
@@ -336,7 +340,10 @@ class KPIDetailDialog(QDialog):
         layout.addWidget(closeBtn, alignment=Qt.AlignmentFlag.AlignRight)
 
     def populate_table(self, columns: list, data: list):
-        """Populate detail table"""
+        """
+        Populate detail table
+        FIXED: Make items non-editable by removing ItemIsEditable flag
+        """
         self.detailTable.setColumnCount(len(columns))
         self.detailTable.setHorizontalHeaderLabels(columns)
         self.detailTable.setRowCount(len(data))
@@ -345,4 +352,6 @@ class KPIDetailDialog(QDialog):
             for c, val in enumerate(row):
                 item = QTableWidgetItem(str(val))
                 item.setTextAlignment(Qt.AlignmentFlag.AlignCenter)
+                # FIXED: Remove the ItemIsEditable flag to make items non-editable
+                item.setFlags(item.flags() & ~Qt.ItemFlag.ItemIsEditable)
                 self.detailTable.setItem(r, c, item)
