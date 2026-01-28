@@ -3,7 +3,8 @@ from PyQt6.QtWidgets import (
     QWidget, QVBoxLayout, QHBoxLayout, QLabel, QPushButton, QFrame,
     QTableWidget, QTableWidgetItem, QHeaderView, QGridLayout
 )
-from PyQt6.QtGui import QFont, QPixmap
+from PyQt6.QtGui import QFont, QPixmap, QColor
+
 
 class ShiftSummaryView(QWidget):
     """Shift Summary Window for Cashiers"""

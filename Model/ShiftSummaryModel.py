@@ -1,7 +1,8 @@
 """
-ShiftSummaryModel.py
+ShiftSummaryModel.py - FIXED
 Model for Shift Summary operations - Returns queries and parameters
-Controller executes the queries
+FIXED: Queries now use today's start time (midnight) instead of shift-specific times
+This ensures all cashiers see their transactions from today regardless of their assigned shift
 """
 from datetime import datetime
 
@@ -10,13 +11,17 @@ class ShiftSummaryModel:
     """
     Shift Summary model - Provides SQL queries and parameters
     Controllers handle database execution
+
+    FIXED: All queries now filter by cashier_id and transactions from today (midnight onwards)
     """
 
     @staticmethod
-    def get_total_sales_query(cashier_id: int, shift_start: datetime):
+    def get_total_sales_query(cashier_id: int, today_start: datetime):
         """
-        Get query for total sales in shift
+        Get query for total sales from today
         Returns: (query, params)
+
+        FIXED: Uses today_start (midnight) instead of shift_start
         """
         query = """
             SELECT COALESCE(SUM(final_total), 0) as total_sales
@@ -25,14 +30,16 @@ class ShiftSummaryModel:
               AND status = 'completed'
               AND transaction_date >= %s
         """
-        params = (cashier_id, shift_start)
+        params = (cashier_id, today_start)
         return query, params
 
     @staticmethod
-    def get_items_sold_query(cashier_id: int, shift_start: datetime):
+    def get_items_sold_query(cashier_id: int, today_start: datetime):
         """
-        Get query for items sold in shift
+        Get query for items sold from today
         Returns: (query, params)
+
+        FIXED: Uses today_start (midnight) instead of shift_start
         """
         query = """
             SELECT COALESCE(SUM(ti.quantity), 0) as items_sold
@@ -42,14 +49,16 @@ class ShiftSummaryModel:
               AND t.status = 'completed'
               AND t.transaction_date >= %s
         """
-        params = (cashier_id, shift_start)
+        params = (cashier_id, today_start)
         return query, params
 
     @staticmethod
-    def get_transaction_count_query(cashier_id: int, shift_start: datetime):
+    def get_transaction_count_query(cashier_id: int, today_start: datetime):
         """
-        Get query for transaction count in shift
+        Get query for transaction count from today
         Returns: (query, params)
+
+        FIXED: Uses today_start (midnight) instead of shift_start
         """
         query = """
             SELECT COUNT(*) as transaction_count
@@ -58,15 +67,16 @@ class ShiftSummaryModel:
               AND status = 'completed'
               AND transaction_date >= %s
         """
-        params = (cashier_id, shift_start)
+        params = (cashier_id, today_start)
         return query, params
 
     @staticmethod
-    def get_payment_breakdown_query(cashier_id: int, shift_start: datetime):
+    def get_payment_breakdown_query(cashier_id: int, today_start: datetime):
         """
-        Get query for payment methods breakdown
+        Get query for payment methods breakdown from today
         Returns: (query, params)
 
+        FIXED: Uses today_start (midnight) instead of shift_start
         Note: Since we don't have a separate payments table yet,
         we'll return a placeholder query. Update when payments table is added.
         """
@@ -85,14 +95,16 @@ class ShiftSummaryModel:
                 0 as count,
                 0 as total
         """
-        params = (cashier_id, shift_start)
+        params = (cashier_id, today_start)
         return query, params
 
     @staticmethod
-    def get_top_products_query(cashier_id: int, shift_start: datetime):
+    def get_top_products_query(cashier_id: int, today_start: datetime):
         """
-        Get query for top 5 products sold
+        Get query for top 5 products sold from today
         Returns: (query, params)
+
+        FIXED: Uses today_start (midnight) instead of shift_start
         """
         query = """
             SELECT 
@@ -107,14 +119,16 @@ class ShiftSummaryModel:
             ORDER BY total_qty DESC
             LIMIT 5
         """
-        params = (cashier_id, shift_start)
+        params = (cashier_id, today_start)
         return query, params
 
     @staticmethod
-    def get_shift_transactions_query(cashier_id: int, shift_start: datetime):
+    def get_shift_transactions_query(cashier_id: int, today_start: datetime):
         """
-        Get query for all transactions in shift
+        Get query for all transactions from today
         Returns: (query, params)
+
+        FIXED: Uses today_start (midnight) instead of shift_start
         """
         query = """
             SELECT 
@@ -132,14 +146,16 @@ class ShiftSummaryModel:
             GROUP BY t.transaction_id
             ORDER BY t.transaction_date DESC
         """
-        params = (cashier_id, shift_start)
+        params = (cashier_id, today_start)
         return query, params
 
     @staticmethod
-    def get_hourly_sales_query(cashier_id: int, shift_start: datetime):
+    def get_hourly_sales_query(cashier_id: int, today_start: datetime):
         """
-        Get query for hourly sales breakdown (for charts)
+        Get query for hourly sales breakdown (for charts) from today
         Returns: (query, params)
+
+        FIXED: Uses today_start (midnight) instead of shift_start
         """
         query = """
             SELECT 
@@ -153,5 +169,5 @@ class ShiftSummaryModel:
             GROUP BY HOUR(transaction_date)
             ORDER BY hour
         """
-        params = (cashier_id, shift_start)
+        params = (cashier_id, today_start)
         return query, params
